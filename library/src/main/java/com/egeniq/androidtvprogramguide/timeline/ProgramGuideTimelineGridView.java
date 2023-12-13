@@ -14,36 +14,30 @@
  * limitations under the License.
  */
 
-package com.egeniq.androidtvprogramguide.timeline
+package com.egeniq.androidtvprogramguide.timeline;
 
-import android.content.Context
-import android.util.AttributeSet
-import android.view.View
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import android.content.Context;
+import android.util.AttributeSet;
+import android.view.View;
 
-open class ProgramGuideTimelineGridView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyle: Int = 0
-) : RecyclerView(context, attrs, defStyle) {
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-    init {
-        layoutManager = object : LinearLayoutManager(context, HORIZONTAL, false) {
-            override fun onRequestChildFocus(
-                parent: RecyclerView,
-                state: State,
-                child: View,
-                focused: View?
-            ): Boolean {
+public class ProgramGuideTimelineGridView extends RecyclerView {
+    public ProgramGuideTimelineGridView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        setLayoutManager(new LinearLayoutManager(context, HORIZONTAL, false) {
+            @Override
+            public boolean onRequestChildFocus(@NonNull RecyclerView parent, @NonNull RecyclerView.State state,
+                                               @NonNull View child, View focused) {
                 // This disables the default scroll behavior for focus movement.
-                return true
+                return true;
             }
-        }
-
+        });
         // RecyclerView is always focusable, however this is not desirable for us, so disable.
         // See b/18863217 (ag/634046) for reasons to why RecyclerView is focusable.
-        isFocusable = false
+        setFocusable(false);
 
         // Don't cache anything that is off screen. Normally it is good to prefetch and prepopulate
         // off screen views in order to reduce jank, however the program guide is capable to scroll
@@ -51,10 +45,19 @@ open class ProgramGuideTimelineGridView @JvmOverloads constructor(
         // but also keep views in the perpendicular direction up to date.
         // E.g. when scrolling horizontally we would have to update rows above and below the current
         // view port even though they are not visible.
-        setItemViewCacheSize(0)
+        setItemViewCacheSize(0);
     }
 
-    final override fun setItemViewCacheSize(size: Int) {
-        super.setItemViewCacheSize(size)
+    public ProgramGuideTimelineGridView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public ProgramGuideTimelineGridView(Context context) {
+        this(context, null);
+    }
+
+    @Override
+    public final void setItemViewCacheSize(int size) {
+        super.setItemViewCacheSize(size);
     }
 }

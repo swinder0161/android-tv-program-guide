@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.egeniq.androidtvprogramguide
+package com.egeniq.androidtvprogramguide.entity;
 
-import com.egeniq.androidtvprogramguide.entity.ProgramGuideSchedule
+import android.text.Spanned;
 
-interface ProgramGuideHolder<T> {
-    val programGuideGrid: ProgramGuideGridView<T>
-    val programGuideManager: ProgramGuideManager<T>
-
-    fun getTimelineRowScrollOffset(): Int
-    fun onScheduleClickedInternal(schedule: ProgramGuideSchedule<T>)
-
-    val DISPLAY_SHOW_PROGRESS: Boolean
+/**
+ * A channel which may be associated with multiple programmes.
+ * Channels are displayed on the left side of the screen, and display the image you have defined in the URL,
+ * and the name to the right of the image. ID is only used for identification purposes, and should be unique.
+ */
+public interface ProgramGuideChannel {
+    String getId();
+    Spanned getName();
+    String getImageUrl();
 }

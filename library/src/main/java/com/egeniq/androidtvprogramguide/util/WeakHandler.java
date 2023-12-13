@@ -14,26 +14,27 @@
  * limitations under the License.
  */
 
-package com.egeniq.androidtvprogramguide.util
+package com.egeniq.androidtvprogramguide.util;
 
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 
-import java.lang.ref.WeakReference
+import androidx.annotation.NonNull;
+
+import java.lang.ref.WeakReference;
 
 /**
  * A Handler that keeps a [WeakReference] to an object.
- *
+ * <p>
  * Use this to prevent leaking an Activity or other Context while messages are still pending.
  * When you extend this class you **MUST NOT** use a non static inner class, or the
  * containing object will still be leaked.
- *
- * See [Avoiding memory leaks](http://android-developers.blogspot.com/2009/01/avoiding-memory-leaks.html).
+ * <p>
+ * See [Avoiding memory leaks](<a href="http://android-developers.blogspot.com/2009/01/avoiding-memory-leaks.html">...</a>).
  */
-@Suppress("unused")
-abstract class WeakHandler<T> : Handler {
-    private val mRef: WeakReference<T>
+public abstract class WeakHandler<T> extends Handler {
+    private final WeakReference<T> mRef;
 
     /**
      * Constructs a new handler with a weak reference to the given referent using the provided
@@ -42,8 +43,9 @@ abstract class WeakHandler<T> : Handler {
      * @param looper The looper, must not be null.
      * @param ref the referent to track
      */
-    constructor(looper: Looper, ref: T) : super(looper) {
-        mRef = WeakReference(ref)
+    public WeakHandler(Looper looper, T ref) {
+        super(looper);
+        mRef = new WeakReference<>(ref);
     }
 
     /**
@@ -51,25 +53,27 @@ abstract class WeakHandler<T> : Handler {
      *
      * @param ref the referent to track
      */
-    @Deprecated("'constructor Handler()' is deprecated")
-    constructor(ref: T) {
-        mRef = WeakReference(ref)
+    public WeakHandler(T ref) {
+        mRef = new WeakReference<>(ref);
     }
 
     /** Calls [.handleMessage] if the WeakReference is not cleared.  */
-    override fun handleMessage(msg: Message) {
-        val referent = mRef.get() ?: return
-        handleMessage(msg, referent)
+    @Override
+    public void handleMessage(@NonNull Message msg) {
+        final T referent = mRef.get();
+        if (referent != null) {
+            handleMessage(msg, referent);
+        }
     }
 
     /**
      * Subclasses must implement this to receive messages.
-     *
+     * <p>
      *
      * If the WeakReference is cleared this method will no longer be called.
      *
      * @param msg the message to handle
      * @param referent the referent. Guaranteed to be non null.
      */
-    protected abstract fun handleMessage(msg: Message, referent: T)
+    protected abstract void handleMessage(Message msg, T referent);
 }

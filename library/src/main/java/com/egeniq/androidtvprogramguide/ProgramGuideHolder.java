@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-package com.egeniq.androidtvprogramguide.util
+package com.egeniq.androidtvprogramguide;
 
-data class FilterOption(
-    val displayTitle: String,
-    val value: String,
-    val isDefaultValue: Boolean
-)
+import com.egeniq.androidtvprogramguide.entity.ProgramGuideSchedule;
+
+public interface ProgramGuideHolder<T> {
+    ProgramGuideGridView<T> getProgramGuideGrid();
+    ProgramGuideManager<T> getProgramGuideManager();
+    int getTimelineRowScrollOffset();
+    void onScheduleClickedInternal(ProgramGuideSchedule<T> schedule);
+    boolean getDISPLAY_SHOW_PROGRESS();
+}

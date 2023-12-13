@@ -12,24 +12,26 @@
  * the License.
  */
 
-package com.egeniq.programguide
+package com.egeniq.programguide;
 
-import android.os.Bundle
-import androidx.fragment.app.FragmentActivity
-import com.jakewharton.threetenabp.AndroidThreeTen
+import android.os.Bundle;
+
+import androidx.fragment.app.FragmentActivity;
+
+import com.jakewharton.threetenabp.AndroidThreeTen;
 
 /**
  * Loads [EpgFragment].
  */
-class MainActivity : FragmentActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+public class MainActivity extends FragmentActivity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         // Initialize the 310 backport lib. Usually you do this in your application object
-        AndroidThreeTen.init(this)
-        setContentView(R.layout.activity_main)
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, EpgFragment())
-            .commit()
+        AndroidThreeTen.init(this);
+        setContentView(R.layout.activity_main);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new EpgFragment())
+                .commit();
     }
 }
