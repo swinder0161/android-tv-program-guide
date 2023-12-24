@@ -24,4 +24,5 @@ public interface ProgramGuideHolder<T> {
     int getTimelineRowScrollOffset();
     void onScheduleClickedInternal(ProgramGuideSchedule<T> schedule);
     boolean getDISPLAY_SHOW_PROGRESS();
+    void setROLLING_WINDOW_HOURS(int hours);
 }

@@ -92,15 +92,30 @@ public abstract class ProgramGuideFragment<T> extends Fragment implements Progra
     protected final DateTimeFormatter FILTER_DATE_FORMATTER  = DateTimeFormatter.ISO_LOCAL_DATE;
     // Config values, override in subclass if necessary
     private final Locale DISPLAY_LOCALE = new Locale("en", "US");
-    protected final ZoneId DISPLAY_TIMEZONE = ZoneOffset.UTC;
-    private final int SELECTABLE_DAYS_IN_PAST = 7;
-    private final int SELECTABLE_DAYS_IN_FUTURE = 7;
+    public ZoneId getDISPLAY_TIMEZONE() {
+        return ZoneOffset.UTC;
+    }
+    public int getSELECTABLE_DAYS_IN_PAST() {
+        return 7;
+    }
+    public int getSELECTABLE_DAYS_IN_FUTURE() {
+        return 7;
+    }
     private final boolean USE_HUMAN_DATES = true;
     private final DateTimeFormatter DATE_WITH_DAY_FORMATTER =
             DateTimeFormatter.ofPattern("EEE d MMM").withLocale(DISPLAY_LOCALE);
     public boolean getDISPLAY_CURRENT_TIME_INDICATOR() { return true; }
     @Override
     public boolean getDISPLAY_SHOW_PROGRESS() { return true; }
+    private boolean ROLLING_WINDOW_HOUR = false;
+    @Override
+    public void setROLLING_WINDOW_HOURS(int hours) {
+        if(hours > 0) {
+            ROLLING_WINDOW_HOUR = true;
+        }
+        getProgramGuideManager().setROLLING_WINDOW_HOURS(hours);
+    }
+
     private final Integer OVERRIDE_LAYOUT_ID = null;
     private int selectionRow = 0;
     private int rowHeight = 0;
@@ -108,7 +123,7 @@ public abstract class ProgramGuideFragment<T> extends Fragment implements Progra
     private int currentTimeIndicatorWidth = 0;
     private int timelineAdjustmentPixels = 0;
     private boolean isInitialScroll = true;
-    private int currentlySelectedFilterIndex = SELECTABLE_DAYS_IN_PAST;
+    private int currentlySelectedFilterIndex = getSELECTABLE_DAYS_IN_PAST();
     private int currentlySelectedTimeOfDayFilterIndex = -1;
     private State currentState = State.Loading;
 
@@ -238,9 +253,9 @@ public abstract class ProgramGuideFragment<T> extends Fragment implements Progra
      */
     private void setupFilters(View view) {
         // Day filter
-        final ZonedDateTime now = FixedZonedDateTime.now().withZoneSameInstant(DISPLAY_TIMEZONE);
+        final ZonedDateTime now = FixedZonedDateTime.now().withZoneSameInstant(getDISPLAY_TIMEZONE());
         final List<FilterOption> dayFilterOptions = new ArrayList<>();
-        for (int dayIndex = -SELECTABLE_DAYS_IN_PAST; dayIndex < SELECTABLE_DAYS_IN_FUTURE; dayIndex++) {
+        for (int dayIndex = -getSELECTABLE_DAYS_IN_PAST(); dayIndex < getSELECTABLE_DAYS_IN_FUTURE(); dayIndex++) {
             if (USE_HUMAN_DATES && dayIndex == -1) {
                 dayFilterOptions.add(new FilterOption(
                         getString(R.string.programguide_day_yesterday),
@@ -336,7 +351,7 @@ public abstract class ProgramGuideFragment<T> extends Fragment implements Progra
      * the current timestamp.
      */
     private void setJumpToLiveButtonVisible(boolean visible) {
-        if (null != getJumpToLive())
+        if (null != getJumpToLive() && ROLLING_WINDOW_HOUR==false)
             getJumpToLive().setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
@@ -408,7 +423,7 @@ public abstract class ProgramGuideFragment<T> extends Fragment implements Progra
         if (getCurrentDateView() != null) {
             getCurrentDateView().setAlpha(0.0F);
         }
-        final ProgramGuideTimeListAdapter timelineAdapter = new ProgramGuideTimeListAdapter(getResources(), DISPLAY_TIMEZONE);
+        final ProgramGuideTimeListAdapter timelineAdapter = new ProgramGuideTimeListAdapter(getResources(), getDISPLAY_TIMEZONE());
         if (timelineStartMillis > 0L) {
             timelineAdapter.update(timelineStartMillis, timelineAdjustmentPixels);
         }
@@ -440,6 +455,9 @@ public abstract class ProgramGuideFragment<T> extends Fragment implements Progra
             didScrollToBestProgramme = false;
             setState(State.Content);
         }
+        getDayFilter().setVisibility(ROLLING_WINDOW_HOUR ? View.GONE : View.VISIBLE);
+        getTimeOfDayFilter().setVisibility(ROLLING_WINDOW_HOUR ? View.GONE : View.VISIBLE);
+        getJumpToLive().setVisibility(ROLLING_WINDOW_HOUR ? View.GONE : View.VISIBLE);
     }
 
     /**
@@ -586,7 +604,7 @@ public abstract class ProgramGuideFragment<T> extends Fragment implements Progra
     public final void setData(List<ProgramGuideChannel> newChannels,
                               Map<String, List<ProgramGuideSchedule<T>>> newChannelEntries,
                               LocalDate selectedDate) {
-        getProgramGuideManager().setData(newChannels, newChannelEntries, selectedDate, DISPLAY_TIMEZONE);
+        getProgramGuideManager().setData(newChannels, newChannelEntries, selectedDate, getDISPLAY_TIMEZONE());
     }
 
     @Override
@@ -677,7 +695,7 @@ public abstract class ProgramGuideFragment<T> extends Fragment implements Progra
 
     private void updateTimeOfDayFilter() {
         final int leftHour =
-                Instant.ofEpochMilli(getProgramGuideManager().getFromUtcMillis()).atZone(DISPLAY_TIMEZONE).getHour();
+                Instant.ofEpochMilli(getProgramGuideManager().getFromUtcMillis()).atZone(getDISPLAY_TIMEZONE()).getHour();
         final int selectedItemPosition = (leftHour < MORNING_UNTIL_HOUR) ? 0 :
                 ((leftHour < AFTERNOON_UNTIL_HOUR) ? 1 : 2);
         if (currentlySelectedTimeOfDayFilterIndex != selectedItemPosition) {
@@ -694,7 +712,7 @@ public abstract class ProgramGuideFragment<T> extends Fragment implements Progra
     private void updateCurrentDateText() {
         // The day might have changed
         final ZonedDateTime viewportStartTime =
-                Instant.ofEpochMilli(getProgramGuideManager().getFromUtcMillis()).atZone(DISPLAY_TIMEZONE);
+                Instant.ofEpochMilli(getProgramGuideManager().getFromUtcMillis()).atZone(getDISPLAY_TIMEZONE());
         String dateText = DATE_WITH_DAY_FORMATTER.format(viewportStartTime);
         if (dateText.endsWith(".")) {
             int sz = dateText.length();
@@ -868,7 +886,7 @@ public abstract class ProgramGuideFragment<T> extends Fragment implements Progra
             // Go to the selected time of day.
             final ZonedDateTime timelineDate =
                     Instant.ofEpochMilli((getProgramGuideManager().getStartTime() + getProgramGuideManager().getEndTime()) / 2)
-                            .atZone(DISPLAY_TIMEZONE);
+                            .atZone(getDISPLAY_TIMEZONE());
             final int scrollToHour = (currentlySelectedTimeOfDayFilterIndex == 0) ?
                     MORNING_STARTS_AT_HOUR :
                     ((currentlySelectedTimeOfDayFilterIndex == 1) ? MORNING_UNTIL_HOUR :

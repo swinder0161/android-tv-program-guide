@@ -40,6 +40,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class EpgFragment extends ProgramGuideFragment<EpgFragment.SimpleProgram> {
     public EpgFragment() {
         super();
+        setROLLING_WINDOW_HOURS(24);
     }
     // Feel free to change configuration values like this:
     //
@@ -101,7 +102,7 @@ public class EpgFragment extends ProgramGuideFragment<EpgFragment.SimpleProgram>
 
     @Override
     public void onScheduleClicked(ProgramGuideSchedule<SimpleProgram> programGuideSchedule) {
-        final SimpleProgram innerSchedule = (SimpleProgram)programGuideSchedule.program;
+        final SimpleProgram innerSchedule = programGuideSchedule.program;
         if (innerSchedule == null) {
             // If this happens, then our data source gives partial info
             Log.w(TAG, "Unable to open schedule!");
@@ -155,17 +156,17 @@ public class EpgFragment extends ProgramGuideFragment<EpgFragment.SimpleProgram>
 
         final ZonedDateTime MIN_CHANNEL_START_TIME =
                 localDate.atStartOfDay().withHour(2).truncatedTo(ChronoUnit.HOURS)
-                        .atZone(DISPLAY_TIMEZONE);
+                        .atZone(getDISPLAY_TIMEZONE());
         final ZonedDateTime MAX_CHANNEL_START_TIME =
                 localDate.atStartOfDay().withHour(8).truncatedTo(ChronoUnit.HOURS)
-                        .atZone(DISPLAY_TIMEZONE);
+                        .atZone(getDISPLAY_TIMEZONE());
 
         final ZonedDateTime MIN_CHANNEL_END_TIME =
                 localDate.atStartOfDay().withHour(21).truncatedTo(ChronoUnit.HOURS)
-                        .atZone(DISPLAY_TIMEZONE);
+                        .atZone(getDISPLAY_TIMEZONE());
         final ZonedDateTime MAX_CHANNEL_END_TIME =
                 localDate.plusDays(1).atStartOfDay().withHour(4).truncatedTo(ChronoUnit.HOURS)
-                        .atZone(DISPLAY_TIMEZONE);
+                        .atZone(getDISPLAY_TIMEZONE());
 
         final long MIN_SHOW_LENGTH_SECONDS = TimeUnit.MINUTES.toSeconds(5);
         final long MAX_SHOW_LENGTH_SECONDS = TimeUnit.MINUTES.toSeconds(120);

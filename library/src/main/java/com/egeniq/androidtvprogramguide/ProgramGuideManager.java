@@ -23,11 +23,13 @@ import androidx.annotation.MainThread;
 import com.egeniq.androidtvprogramguide.entity.ProgramGuideChannel;
 import com.egeniq.androidtvprogramguide.entity.ProgramGuideSchedule;
 import com.egeniq.androidtvprogramguide.util.FixedZonedDateTime;
+import com.egeniq.androidtvprogramguide.util.ProgramGuideUtil;
 
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.ZoneId;
 import org.threeten.bp.ZonedDateTime;
 
+import org.threeten.bp.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -54,10 +56,25 @@ public class ProgramGuideManager<T> {
     private long toUtcMillis = 0;
     public final List<Listener> listeners = new ArrayList<>();
     private final List<ProgramGuideChannel> channels = new ArrayList<>();
+    public void addChannel(ProgramGuideChannel channel) {
+        channels.add(channel);
+    }
+    public List<ProgramGuideChannel> getChannels() {
+        return channels;
+    }
     private final Map<String, List<ProgramGuideSchedule<T>>> channelEntriesMap = new LinkedHashMap<>();
-
+    public void addChannelEntries(String chid, List<ProgramGuideSchedule<T>> programs) {
+        channelEntriesMap.put(chid, programs);
+    }
+    public List<ProgramGuideSchedule<T>> getChannelEntries(String chid) {
+        return channelEntriesMap.get(chid);
+    }
     public int getChannelCount() {
         return channels.size();
+    }
+    private int ROLLING_WINDOW_HOURS = 0;
+    public void setROLLING_WINDOW_HOURS(int hours) {
+        ROLLING_WINDOW_HOURS = hours;
     }
 
     /** Returns the start time of currently managed time range, in UTC millisecond.  */
@@ -117,10 +134,16 @@ public class ProgramGuideManager<T> {
                     entries.add(ProgramGuideSchedule.createGap(startUtcMillis, endUtcMillis));
                 } else {
                     // Cut off items which don't belong in the desired timeframe
-                    final ZonedDateTime timelineStartsAt =
-                            selectedDate.atStartOfDay(timeZone).withHour(DAY_STARTS_AT_HOUR);
-                    final ZonedDateTime timelineEndsAt =
-                            timelineStartsAt.plusDays(1L).withHour(DAY_ENDS_NEXT_DAY_AT_HOUR);
+                    ZonedDateTime timelineStartsAt, timelineEndsAt;
+                    if(ROLLING_WINDOW_HOURS <= 0) {
+                        timelineStartsAt = selectedDate.atStartOfDay(timeZone).withHour(DAY_STARTS_AT_HOUR);
+                        timelineEndsAt = timelineStartsAt.plusDays(1L).withHour(DAY_ENDS_NEXT_DAY_AT_HOUR);
+                    } else {
+                        timelineStartsAt = ZonedDateTime.now(timeZone).with(ChronoField.INSTANT_SECONDS, (ProgramGuideUtil.floorTime(System.currentTimeMillis() - ENTRY_MIN_DURATION,
+                                TimeUnit.MINUTES.toMillis(30))) / 1000);
+                        timelineEndsAt =
+                                timelineStartsAt.plusHours(ROLLING_WINDOW_HOURS);
+                    }
 
                     final long timelineStartsAtMillis = timelineStartsAt.toEpochSecond() * (long)1000;
                     final long timelineEndsAtMillis = timelineEndsAt.toEpochSecond() * (long)1000;
@@ -361,10 +384,14 @@ public class ProgramGuideManager<T> {
     public void setData(List<ProgramGuideChannel> newChannels,
                         Map<String, List<ProgramGuideSchedule<T>>> newChannelEntries,
                         LocalDate selectedDate, ZoneId timeZone) {
-        channels.clear();
-        channelEntriesMap.clear();
-        channels.addAll(newChannels);
-        channelEntriesMap.putAll(newChannelEntries);
+        if(newChannels != null) {
+            channels.clear();
+            channels.addAll(newChannels);
+        }
+        if(newChannelEntries != null) {
+            channelEntriesMap.clear();
+            channelEntriesMap.putAll(newChannelEntries);
+        }
         updateChannelsTimeRange(selectedDate, timeZone);
         notifySchedulesUpdated();
     }
