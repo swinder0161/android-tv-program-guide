@@ -122,6 +122,7 @@ public class ProgramGuideRowAdapter
     public static class ProgramRowViewHolder extends RecyclerView.ViewHolder {
         private final ProgramGuideRowGridView rowGridView;
         private final TextView channelNameView;
+        private final TextView channelNumberView;
         private final ImageView channelLogoView;
 
         public ProgramRowViewHolder(View itemView) {
@@ -129,6 +130,7 @@ public class ProgramGuideRowAdapter
             ViewGroup container = (ViewGroup) itemView;
             rowGridView = container.findViewById(R.id.row);
             channelNameView = container.findViewById(R.id.programguide_channel_name);
+            channelNumberView = container.findViewById(R.id.programguide_channel_number);
             channelLogoView = container.findViewById(R.id.programguide_channel_logo);
             ViewGroup channelContainer = container.findViewById(R.id.programguide_channel_container);
             channelContainer.getViewTreeObserver().addOnGlobalFocusChangeListener((v1, v2) ->
@@ -148,6 +150,7 @@ public class ProgramGuideRowAdapter
         private void onBindChannel(ProgramGuideChannel channel) {
             if (channel == null) {
                 channelNameView.setVisibility(View.GONE);
+                channelNumberView.setVisibility(View.GONE);
                 channelLogoView.setVisibility(View.GONE);
                 return;
             }
@@ -161,6 +164,9 @@ public class ProgramGuideRowAdapter
 
             channelNameView.setText(channel.getName());
             channelNameView.setVisibility(View.VISIBLE);
+
+            channelNumberView.setText("" + channel.getNumber());
+            channelNumberView.setVisibility(View.VISIBLE);
         }
 
         public void updateLayout() {

@@ -53,6 +53,7 @@ public class EpgFragment extends ProgramGuideFragment<EpgFragment.SimpleProgram>
         private final String id;
         private final Spanned name;
         private final String imageUrl;
+        private final int number;
 
         @Override
         public String getId() {
@@ -67,11 +68,17 @@ public class EpgFragment extends ProgramGuideFragment<EpgFragment.SimpleProgram>
             return imageUrl;
         }
 
-        public SimpleChannel(String _id, Spanned _name, String _imageUrl) {
+        @Override
+        public int getNumber() {
+            return number;
+        }
+
+        public SimpleChannel(String _id, Spanned _name, String _imageUrl, int _number) {
             super();
             id = _id;
             name = _name;
             imageUrl = _imageUrl;
+            number = _number;
         }
 
         @NonNull
@@ -172,51 +179,61 @@ public class EpgFragment extends ProgramGuideFragment<EpgFragment.SimpleProgram>
         final long MAX_SHOW_LENGTH_SECONDS = TimeUnit.MINUTES.toSeconds(120);
         Single<Pair<List<ProgramGuideChannel>, Map<String, List<ProgramGuideSchedule<SimpleProgram>>>>> single =
                 Single.fromCallable(() -> {
+                    int i = 0;
                     final List<ProgramGuideChannel> channels = new ArrayList<>();
                     channels.add(new SimpleChannel(
                             "npo-1",
                             new SpannedString("NPO 1"),
-                            "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/NPO_1_logo_2014.svg/320px-NPO_1_logo_2014.svg.png"
+                            "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/NPO_1_logo_2014.svg/320px-NPO_1_logo_2014.svg.png",
+                            i++
                     ));
                     channels.add(new SimpleChannel(
                             "npo-2",
                             new SpannedString("NPO 2"),
-                            "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/NPO_2_logo_2014.svg/275px-NPO_2_logo_2014.svg.png"
+                            "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/NPO_2_logo_2014.svg/275px-NPO_2_logo_2014.svg.png",
+                            i++
                     ));
                     channels.add(new SimpleChannel(
                             "bbc-news",
                             new SpannedString("BBC NEWS"),
-                            "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/BBC_News_2019.svg/200px-BBC_News_2019.svg.png"
+                            "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/BBC_News_2019.svg/200px-BBC_News_2019.svg.png",
+                            i++
                     ));
                     channels.add(new SimpleChannel(
                             "zdf",
                             new SpannedString("ZDF"),
-                            "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/ZDF_logo.svg/200px-ZDF_logo.svg.png"
+                            "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/ZDF_logo.svg/200px-ZDF_logo.svg.png",
+                            i++
                     ));
                     channels.add(new SimpleChannel(
                             "jednotka",
                             new SpannedString("Jednotka"),
-                            "https://upload.wikimedia.org/wikipedia/en/thumb/7/76/Jednotka.svg/255px-Jednotka.svg.png"
+                            "https://upload.wikimedia.org/wikipedia/en/thumb/7/76/Jednotka.svg/255px-Jednotka.svg.png",
+                            i++
                     ));
                     channels.add(new SimpleChannel(
                             "tv-nova",
                             new SpannedString("TV nova"),
-                            "https://upload.wikimedia.org/wikipedia/commons/2/2f/TV_Nova_logo_2017.png"
+                            "https://upload.wikimedia.org/wikipedia/commons/2/2f/TV_Nova_logo_2017.png",
+                            i++
                     ));
                     channels.add(new SimpleChannel(
                             "tv-5-monde",
                             new SpannedString("TV5MONDE"),
-                            "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/TV5MONDE_logo.png/320px-TV5MONDE_logo.png"
+                            "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/TV5MONDE_logo.png/320px-TV5MONDE_logo.png",
+                            i++
                     ));
                     channels.add(new SimpleChannel(
                             "orf-2",
                             new SpannedString("ORF 2"),
-                            "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/ORF2_logo_n.svg/320px-ORF2_logo_n.svg.png"
+                            "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/ORF2_logo_n.svg/320px-ORF2_logo_n.svg.png",
+                            i++
                     ));
                     channels.add(new SimpleChannel(
                             "tvp-1",
                             new SpannedString("TVP 1"),
-                            "https://upload.wikimedia.org/wikipedia/commons/e/ec/Tvp1.png"
+                            "https://upload.wikimedia.org/wikipedia/commons/e/ec/Tvp1.png",
+                            i
                     ));
 
                     final List<String> showNames = new ArrayList<>();

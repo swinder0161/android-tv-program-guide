@@ -55,12 +55,9 @@ public class ProgramGuideManager<T> {
     private long fromUtcMillis = 0;
     private long toUtcMillis = 0;
     public final List<Listener> listeners = new ArrayList<>();
-    private final List<ProgramGuideChannel> channels = new ArrayList<>();
-    public void addChannel(ProgramGuideChannel channel) {
-        channels.add(channel);
-    }
-    public List<ProgramGuideChannel> getChannels() {
-        return channels;
+    public final List<ProgramGuideChannel> channels = new ArrayList<>();
+    public int getChannelCount() {
+        return channels.size();
     }
     private final Map<String, List<ProgramGuideSchedule<T>>> channelEntriesMap = new LinkedHashMap<>();
     public void addChannelEntries(String chid, List<ProgramGuideSchedule<T>> programs) {
@@ -68,9 +65,6 @@ public class ProgramGuideManager<T> {
     }
     public List<ProgramGuideSchedule<T>> getChannelEntries(String chid) {
         return channelEntriesMap.get(chid);
-    }
-    public int getChannelCount() {
-        return channels.size();
     }
     private int ROLLING_WINDOW_HOURS = 0;
     public void setROLLING_WINDOW_HOURS(int hours) {

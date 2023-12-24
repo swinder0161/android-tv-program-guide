@@ -27,4 +27,5 @@ public interface ProgramGuideChannel {
     String getId();
     Spanned getName();
     String getImageUrl();
+    int getNumber();
 }

@@ -22,20 +22,30 @@
     android:layout_width="@dimen/programguide_channel_column_width"
     android:layout_height="@dimen/programguide_program_row_height_with_empty_space"
     android:background="@drawable/programguide_channel_item_background"
-    android:paddingLeft="@dimen/programguide_page_left_padding">
+    >
+
+    <TextView
+        android:id="@+id/programguide_channel_number"
+        style="@style/ProgramGuide.Text.Channel"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        tools:text="1004" />
+
+    <ImageView
+        android:id="@+id/programguide_channel_logo"
+        style="@style/ProgramGuide.Image.Channel"
+        android:contentDescription="@string/programguide_content_description_channel_logo"
+        android:layout_marginStart="36dp"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/programguide_channel_name"
         style="@style/ProgramGuide.Text.Channel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
         tools:text="NPO Zappelin Xtra" />
-
-    <ImageView
-        android:id="@+id/programguide_channel_logo"
-        style="@style/ProgramGuide.Image.Channel"
-        android:contentDescription="@string/programguide_content_description_channel_logo"
-        android:visibility="gone"
-        tools:visibility="visible" />
 
 </FrameLayout>
