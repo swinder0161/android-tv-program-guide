@@ -210,8 +210,6 @@ public final class ProgramGuideGridView<T> extends VerticalGridView {
         nextFocusByUpDown = null;
         // If focus is not a program item, drop focus to the current program when back to the grid
         // Only used if the feature flag is enabled
-        //TODO
-        // ProgramGuideItemView or ProgramGuideItemView<?>
         internalKeepCurrentProgramFocused = featureKeepCurrentProgramFocused &&
                 (!(focus instanceof ProgramGuideItemView<?>) || ProgramGuideUtil.isCurrentProgram((ProgramGuideItemView<?>)focus));
     }

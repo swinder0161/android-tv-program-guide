@@ -31,7 +31,8 @@ public final class FixedZonedDateTime {
         ZonedDateTime ret;
         try {
             ret = ZonedDateTime.now();
-        } catch (DateTimeException var6) {
+        } catch (DateTimeException ex) {
+            ex.printStackTrace();
             long now = System.currentTimeMillis();
             Instant instant = Instant.ofEpochMilli(now);
             ret = ZonedDateTime.from((TemporalAccessor)instant);

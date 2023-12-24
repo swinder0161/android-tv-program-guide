@@ -910,6 +910,14 @@ public abstract class ProgramGuideFragment<T> extends Fragment implements Progra
     public void scrollToChannelWithId(String channelId) {
         final Integer index = getProgramGuideManager().getChannelIndex(channelId);
         if (index != null) {
+            getProgramGuideGrid().scrollToPosition(index);
+            autoScrollToBestProgramme(false, channelId);
+        }
+    }
+
+    public void smoothScrollToChannelWithId(String channelId) {
+        final Integer index = getProgramGuideManager().getChannelIndex(channelId);
+        if (index != null) {
             getProgramGuideGrid().smoothScrollToPosition(index);
             autoScrollToBestProgramme(false, channelId);
         }

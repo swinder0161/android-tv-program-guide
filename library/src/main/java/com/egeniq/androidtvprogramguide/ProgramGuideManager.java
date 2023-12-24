@@ -125,7 +125,7 @@ public class ProgramGuideManager<T> {
                 List<ProgramGuideSchedule<T>> entries = channelEntriesMap.get(channelId);
                 if (null == entries) entries = new ArrayList<>();
                 if (entries.isEmpty()) {
-                    entries.add(ProgramGuideSchedule.createGap(startUtcMillis, endUtcMillis));
+                    entries.add(ProgramGuideSchedule.createGap(channel.getId(), startUtcMillis, endUtcMillis));
                 } else {
                     // Cut off items which don't belong in the desired timeframe
                     ZonedDateTime timelineStartsAt, timelineEndsAt;
@@ -151,15 +151,15 @@ public class ProgramGuideManager<T> {
                         } else if (current.startsAtMillis < timelineStartsAtMillis && current.endsAtMillis < timelineEndsAtMillis) {
                             // Sticks out both sides
                             timelineIterator.set(
-                                    current.copy(null, timelineStartsAtMillis, timelineEndsAtMillis,
+                                    current.copy(null, null, timelineStartsAtMillis, timelineEndsAtMillis,
                                             null, null, null, null));
                         } else if (current.startsAtMillis < timelineStartsAtMillis) {
                             // Sticks out left
-                            timelineIterator.set(current.copy(null, timelineStartsAtMillis, null,
+                            timelineIterator.set(current.copy(null, null, timelineStartsAtMillis, null,
                                     null, null, null, null));
                         } else if (current.endsAtMillis > timelineEndsAtMillis) {
                             // Sticks out right
-                            timelineIterator.set(current.copy(null, null, timelineEndsAtMillis,
+                            timelineIterator.set(current.copy(null, null, null, timelineEndsAtMillis,
                                     null, null, null, null));
                         }
                     }
@@ -175,21 +175,21 @@ public class ProgramGuideManager<T> {
                     final ProgramGuideSchedule<T> lastEntry = entries.size()==0?null:entries.get(entries.size()-1);
                     if (lastEntry == null || endUtcMillis > lastEntry.endsAtMillis) {
                         // We need to add a gap item to fill the place
-                        entries.add(ProgramGuideSchedule.createGap(
+                        entries.add(ProgramGuideSchedule.createGap(channel.getId(),
                                 lastEntry != null ? lastEntry.endsAtMillis : startUtcMillis, endUtcMillis));
                     } else if (lastEntry.endsAtMillis == java.lang.Long.MAX_VALUE) {
                         entries.remove(entries.size() - 1);
-                        entries.add(ProgramGuideSchedule.createGap(lastEntry.startsAtMillis, endUtcMillis));
+                        entries.add(ProgramGuideSchedule.createGap(channel.getId(), lastEntry.startsAtMillis, endUtcMillis));
                     }
                     // Pad the items on the left
                     final ProgramGuideSchedule<T> firstEntry = entries.size() == 0 ? null : entries.get(0);
                     if (firstEntry == null || startUtcMillis < firstEntry.startsAtMillis) {
                         // We need to add a gap item to fill the place
-                        entries.add(0, ProgramGuideSchedule.createGap(
+                        entries.add(0, ProgramGuideSchedule.createGap(channel.getId(),
                                 startUtcMillis, firstEntry != null ? firstEntry.startsAtMillis : endUtcMillis));
                     } else if (firstEntry.startsAtMillis <= 0) {
                         entries.remove(0);
-                        entries.add(0, ProgramGuideSchedule.createGap(startUtcMillis, firstEntry.endsAtMillis));
+                        entries.add(0, ProgramGuideSchedule.createGap(channel.getId(), startUtcMillis, firstEntry.endsAtMillis));
                     }
                     // Entries in the API not always follow each other. There are empty places which have not been accounted for, which offsets our calculations
                     // At this place, we adjust the ending times to be that of the next item. If the difference here is too big, we will insert a gap manually.
@@ -201,10 +201,10 @@ public class ProgramGuideManager<T> {
                             final ProgramGuideSchedule<T> next = entries.get(listIterator.nextIndex());
                             final long timeDifference = next.startsAtMillis - current.endsAtMillis;
                             if (timeDifference < MAX_UNACCOUNTED_TIME_BEFORE_GAP) {
-                                listIterator.set(current.copy(null, null, next.startsAtMillis,
+                                listIterator.set(current.copy(null, null, null, next.startsAtMillis,
                                         null, null, null, null));
                             } else {
-                                listIterator.add(ProgramGuideSchedule.createGap(current.endsAtMillis, next.startsAtMillis));
+                                listIterator.add(ProgramGuideSchedule.createGap(channel.getId(), current.endsAtMillis, next.startsAtMillis));
                             }
                         }
                     }
@@ -217,20 +217,20 @@ public class ProgramGuideManager<T> {
                         final boolean hasNext = shortIterator.hasNext();
                         if (!hasNext && (millisToAddToNextStart > 0 || currentDuration < ENTRY_MIN_DURATION)) {
                             Log.i(TAG, "The last schedule (" + current.program + ") has been extended because it was too short.");
-                            final ProgramGuideSchedule<T> replacingSchedule = current.copy(null, current.startsAtMillis + millisToAddToNextStart,
+                            final ProgramGuideSchedule<T> replacingSchedule = current.copy(null, null, current.startsAtMillis + millisToAddToNextStart,
                                     Math.max(current.startsAtMillis + ENTRY_MIN_DURATION, current.endsAtMillis),
                                     null, null, null, null);
                             shortIterator.set(replacingSchedule);
                         } else if (currentDuration < ENTRY_MIN_DURATION) {
                             Log.i(TAG, "The schedule (" + current.program + ") has been extended because it was too short.");
-                            final ProgramGuideSchedule<T> replacingSchedule = current.copy(null, current.startsAtMillis + millisToAddToNextStart,
+                            final ProgramGuideSchedule<T> replacingSchedule = current.copy(null, null, current.startsAtMillis + millisToAddToNextStart,
                                     current.startsAtMillis + millisToAddToNextStart + ENTRY_MIN_DURATION,
                                     null, null, null, null);
                             shortIterator.set(replacingSchedule);
                             millisToAddToNextStart = replacingSchedule.endsAtMillis - current.endsAtMillis;
                         } else if (millisToAddToNextStart > 0) {
                             Log.i(TAG, "The schedule (" + current.program + ") has been shortened because the previous schedule had to be extended.");
-                            final ProgramGuideSchedule<T> replacingSchedule = current.copy(null, current.startsAtMillis + millisToAddToNextStart,
+                            final ProgramGuideSchedule<T> replacingSchedule = current.copy(null, null, current.startsAtMillis + millisToAddToNextStart,
                                     null, null, null, null, null);
                             shortIterator.set(replacingSchedule);
                             millisToAddToNextStart = 0;
@@ -415,7 +415,7 @@ public class ProgramGuideManager<T> {
                             mutatedList = new ArrayList<>(list);
                         }
                         final int index = list.indexOf(possibleMatch);
-                        replacement = possibleMatch.copy(null, null, null, null,
+                        replacement = possibleMatch.copy(null, null, null, null, null,
                                 program.isClickable, program.displayTitle, program.program);
                         mutatedList.set(index, replacement);
                     }

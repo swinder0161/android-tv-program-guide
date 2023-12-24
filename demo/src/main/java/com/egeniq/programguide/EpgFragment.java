@@ -121,7 +121,7 @@ public class EpgFragment extends ProgramGuideFragment<EpgFragment.SimpleProgram>
             Toast.makeText(getContext(), "Open detail page", Toast.LENGTH_LONG).show();
         }
         // Example of how a program can be updated. You could also change the underlying program.
-        updateProgram(programGuideSchedule.copy(null, null, null, null, null,
+        updateProgram(programGuideSchedule.copy(null, null, null, null, null, null,
                 programGuideSchedule.displayTitle + " [clicked]", null));
 
     }
@@ -266,7 +266,7 @@ public class EpgFragment extends ProgramGuideFragment<EpgFragment.SimpleProgram>
                                             )
                                     ), ZoneOffset.UTC
                             );
-                            final ProgramGuideSchedule<SimpleProgram> schedule = createSchedule(Random.nextInList(showNames), nextTime, endTime);
+                            final ProgramGuideSchedule<SimpleProgram> schedule = createSchedule(Random.nextInList(showNames), channel.getId(), nextTime, endTime);
                             scheduleList.add(schedule);
                             nextTime = endTime;
                         }
@@ -274,7 +274,7 @@ public class EpgFragment extends ProgramGuideFragment<EpgFragment.SimpleProgram>
                                 nextTime,
                                 MAX_CHANNEL_END_TIME
                         ) : MAX_CHANNEL_END_TIME;
-                        final ProgramGuideSchedule<SimpleProgram> finalSchedule = createSchedule(Random.nextInList(showNames), nextTime, endTime);
+                        final ProgramGuideSchedule<SimpleProgram> finalSchedule = createSchedule(Random.nextInList(showNames), channel.getId(), nextTime, endTime);
                         scheduleList.add(finalSchedule);
                         channelMap.put(channel.getId(), scheduleList);
                     }
@@ -292,11 +292,12 @@ public class EpgFragment extends ProgramGuideFragment<EpgFragment.SimpleProgram>
                     }}, it -> Log.e(TAG, "Unable to load example data!", it));
     }
 
-    private ProgramGuideSchedule<SimpleProgram> createSchedule(String scheduleName, ZonedDateTime startTime, ZonedDateTime endTime) {
+    private ProgramGuideSchedule<SimpleProgram> createSchedule(String scheduleName, String chid, ZonedDateTime startTime, ZonedDateTime endTime) {
         final long id = Random.nextLong(100000L);
         final String metadata = DateTimeFormatter.ofPattern("'Starts at' HH:mm").format(startTime);
         return ProgramGuideSchedule.createScheduleWithProgram(
                 id,
+                chid,
                 startTime.toInstant(),
                 endTime.toInstant(),
                 true,

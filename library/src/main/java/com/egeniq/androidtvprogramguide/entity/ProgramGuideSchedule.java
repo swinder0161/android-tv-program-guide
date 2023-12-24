@@ -33,6 +33,7 @@ import org.threeten.bp.Instant;
  */
 public class ProgramGuideSchedule<T> {
     public final long id;
+    public final String chid;
     public final long startsAtMillis;
     public final long endsAtMillis;
     public final OriginalTimes originalTimes;
@@ -61,24 +62,25 @@ public class ProgramGuideSchedule<T> {
 
     private static final long GAP_ID = -1L;
 
-    public static <T> ProgramGuideSchedule<T> createGap(long from, long to) {
-        return new ProgramGuideSchedule<>(GAP_ID, from, to, new OriginalTimes(from, to),
+    public static <T> ProgramGuideSchedule<T> createGap(String _chid, long from, long to) {
+        return new ProgramGuideSchedule<>(GAP_ID, _chid, from, to, new OriginalTimes(from, to),
                 false, null, null);
     }
 
-    public static <T> ProgramGuideSchedule<T> createScheduleWithProgram(long _id, Instant startsAt, Instant endsAt,
+    public static <T> ProgramGuideSchedule<T> createScheduleWithProgram(long _id, String _chid, Instant startsAt, Instant endsAt,
                                                              boolean _isClickable, String _displayTitle, T _program) {
-        return new ProgramGuideSchedule<>(_id, startsAt.toEpochMilli(), endsAt.toEpochMilli(),
+        return new ProgramGuideSchedule<>(_id, _chid, startsAt.toEpochMilli(), endsAt.toEpochMilli(),
                 new OriginalTimes(startsAt.toEpochMilli(), endsAt.toEpochMilli()), _isClickable, _displayTitle, _program);
     }
 
     public final int width;
     public final boolean isGap;
 
-    public ProgramGuideSchedule(long _id, long _startsAtMillis, long _endsAtMillis,
+    public ProgramGuideSchedule(long _id, String _chid, long _startsAtMillis, long _endsAtMillis,
                                 OriginalTimes _originalTimes, boolean _isClickable,
                                 String _displayTitle, T _program) {
         id = _id;
+        chid = _chid;
         startsAtMillis = _startsAtMillis;
         endsAtMillis = _endsAtMillis;
         originalTimes = _originalTimes;
@@ -89,9 +91,9 @@ public class ProgramGuideSchedule<T> {
         isGap = program == null;
     }
 
-    public ProgramGuideSchedule<T> copy(Long _id, Long startsAt, Long endsAt, OriginalTimes _originalTimes,
+    public ProgramGuideSchedule<T> copy(Long _id, String _chid, Long startsAt, Long endsAt, OriginalTimes _originalTimes,
                                         Boolean _isClickable, String _displayTitle, T _program) {
-        return new ProgramGuideSchedule<>(_id==null?id: _id, startsAt==null?startsAtMillis:startsAt,
+        return new ProgramGuideSchedule<>(_id==null?id: _id, _chid==null?chid:_chid, startsAt==null?startsAtMillis:startsAt,
                 endsAt==null?endsAtMillis: endsAt, _originalTimes==null?originalTimes: _originalTimes,
                 _isClickable==null?isClickable: _isClickable, _displayTitle==null?displayTitle: _displayTitle,
                 _program==null?program: _program);
@@ -104,7 +106,7 @@ public class ProgramGuideSchedule<T> {
 
     @NonNull
     public String toString() {
-        return "ProgramGuideSchedule([@"+ Long.toHexString(this.hashCode()) + "]id=" + id +
+        return "ProgramGuideSchedule([@"+ Long.toHexString(hashCode()) + "]id=" + id + ", chid: " + chid +
                 ", startsAtMillis=" + startsAtMillis + ", endsAtMillis=" + endsAtMillis + ", originalTimes=" + originalTimes +
                 ", isClickable=" + isClickable + ", displayTitle=" + displayTitle + ", program=" + program + ")";
     }
